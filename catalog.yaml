@@ -62,7 +62,7 @@ registry:
         type: server
         upstream: https://github.com/GongRzhe/Gmail-MCP-Server
         volumes:
-            - ~/.gmail-mcp:/root/.gmail-mcp
+            - gmail-mcp-creds:/root/.gmail-mcp
         config:
             - description: |
                 ## Gmail OAuth Setup

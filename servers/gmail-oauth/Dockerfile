@@ -20,5 +20,5 @@ VOLUME ["/root/.gmail-mcp"]
 # Set environment for production
 ENV NODE_ENV=production
 
-# The server runs via npx
-ENTRYPOINT ["npx", "@gongrzhe/server-gmail-autoauth-mcp"]
+# Run the server directly (faster than npx)
+ENTRYPOINT ["gmail-mcp"]
