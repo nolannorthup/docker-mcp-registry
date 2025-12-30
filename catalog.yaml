@@ -1,0 +1,76 @@
+registry:
+    gmail-oauth:
+        dateAdded: "2025-12-30T00:00:00Z"
+        description: Gmail integration with OAuth 2.0 authentication. Send, read, search, and manage emails through Claude. Supports attachments, labels, filters, and batch operations.
+        icon: https://www.gstatic.com/images/branding/product/2x/gmail_2020q4_512dp.png
+        image: mcp/gmail-oauth:latest
+        metadata:
+            category: communication
+            githubStars: 879
+            license: MIT
+            owner: GongRzhe
+            tags:
+                - email
+                - gmail
+                - oauth
+                - google
+                - automation
+        prompts: 0
+        ref: ""
+        resources: {}
+        source: https://github.com/GongRzhe/Gmail-MCP-Server
+        title: Gmail OAuth
+        tools:
+            - name: send_email
+              description: Send email with optional HTML, CC/BCC, attachments
+            - name: draft_email
+              description: Create a draft for later editing
+            - name: read_email
+              description: Get full email content by message ID
+            - name: search_emails
+              description: Search using Gmail syntax
+            - name: modify_email
+              description: Add/remove labels from a message
+            - name: delete_email
+              description: Permanently delete a message
+            - name: list_email_labels
+              description: List all labels
+            - name: create_label
+              description: Create custom label
+            - name: update_label
+              description: Modify label properties
+            - name: delete_label
+              description: Remove custom label
+            - name: get_or_create_label
+              description: Get or create if missing
+            - name: batch_modify_emails
+              description: Modify labels on multiple emails
+            - name: batch_delete_emails
+              description: Delete multiple emails at once
+            - name: create_filter
+              description: Create filter with custom criteria
+            - name: list_filters
+              description: List all filters
+            - name: get_filter
+              description: Get filter details
+            - name: delete_filter
+              description: Remove a filter
+            - name: create_filter_from_template
+              description: Use predefined filter templates
+            - name: download_attachment
+              description: Save attachment to directory
+        type: server
+        upstream: https://github.com/GongRzhe/Gmail-MCP-Server
+        volumes:
+            - ~/.gmail-mcp:/root/.gmail-mcp
+        config:
+            - description: |
+                ## Gmail OAuth Setup
+
+                1. Create Google Cloud Project at https://console.cloud.google.com/
+                2. Enable Gmail API
+                3. Create OAuth 2.0 credentials (Desktop app)
+                4. Download JSON and save as ~/.gmail-mcp/gcp-oauth.keys.json
+                5. Run: npx @gongrzhe/server-gmail-autoauth-mcp auth
+              name: gmail-oauth
+              type: object

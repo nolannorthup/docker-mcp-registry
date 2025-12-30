@@ -4,7 +4,7 @@
 
 name: gmail-oauth
 type: server
-image: mcp/gmail-oauth
+image: mcp/gmail-oauth:latest
 
 meta:
   category: communication
@@ -27,6 +27,10 @@ source:
   project: https://github.com/GongRzhe/Gmail-MCP-Server
   commit: main
 
+# Volume mount for credential persistence
+volumes:
+  - ~/.gmail-mcp:/root/.gmail-mcp
+
 config:
   description: |
     ## Gmail OAuth Setup
@@ -45,28 +49,25 @@ config:
     2. Click "Create Credentials" > "OAuth client ID"
     3. Choose "Desktop app" as the application type
     4. Download the credentials JSON file
+    5. Save as `~/.gmail-mcp/gcp-oauth.keys.json`
 
     ### Step 3: Authenticate
 
-    The first time you use the server, it will:
+    Run the authentication flow:
+    ```
+    npx @gongrzhe/server-gmail-autoauth-mcp auth
+    ```
+
+    This will:
     1. Open a browser window for Google authentication
     2. Request permission to access your Gmail
-    3. Store the refresh token locally for future use
+    3. Store the refresh token in `~/.gmail-mcp/credentials.json`
 
-    ### Credential Storage
+    ### Windows Setup Script
 
-    - OAuth credentials: `~/.gmail-mcp/gcp-oauth.keys.json`
-    - Access tokens: `~/.gmail-mcp/credentials.json`
-
-    These files are stored in a Docker volume and persist between sessions.
+    For Windows users, run:
+    ```powershell
+    .\scripts\setup-gmail-oauth.ps1
+    ```
 
     For detailed instructions, see the [Gmail MCP Server documentation](https://github.com/GongRzhe/Gmail-MCP-Server).
-
-  # Google OAuth credentials file content (JSON)
-  secrets:
-    - name: gmail-oauth.gcp_oauth_keys
-      env: GCP_OAUTH_KEYS
-      example: '{"installed":{"client_id":"...","client_secret":"..."}}'
-
-  # Volume mount for credential persistence
-  # The container needs access to store OAuth tokens
