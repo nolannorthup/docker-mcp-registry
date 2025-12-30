@@ -1,0 +1,35 @@
+# Build artifacts
+pr-output/
+*.bak
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Node (for local validation tools)
+node_modules/
+package-lock.json
+
+# Credentials (NEVER commit these)
+*.keys.json
+credentials.json
+.env
+.env.*
+*.pem
+*.key
+
+# Docker
+*.tar
+
+# Logs
+*.log
+
+# Temporary files
+tmp/
+temp/

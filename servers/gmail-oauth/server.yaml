@@ -1,0 +1,72 @@
+# Gmail MCP Server with OAuth 2.0
+# Source: https://github.com/GongRzhe/Gmail-MCP-Server
+# License: MIT
+
+name: gmail-oauth
+type: server
+image: mcp/gmail-oauth
+
+meta:
+  category: communication
+  tags:
+    - email
+    - gmail
+    - oauth
+    - google
+    - automation
+
+about:
+  title: Gmail OAuth
+  description: >
+    Gmail integration with OAuth 2.0 authentication. Send, read, search, and manage
+    emails through Claude. Supports attachments, labels, filters, and batch operations.
+    Perfect for email automation and content aggregation workflows.
+  icon: https://www.gstatic.com/images/branding/product/2x/gmail_2020q4_512dp.png
+
+source:
+  project: https://github.com/GongRzhe/Gmail-MCP-Server
+  commit: main
+
+config:
+  description: |
+    ## Gmail OAuth Setup
+
+    This server requires Google OAuth 2.0 credentials to access Gmail.
+
+    ### Step 1: Create Google Cloud Project
+
+    1. Go to [Google Cloud Console](https://console.cloud.google.com/)
+    2. Create a new project or select an existing one
+    3. Enable the **Gmail API** in APIs & Services > Library
+
+    ### Step 2: Create OAuth Credentials
+
+    1. Go to APIs & Services > Credentials
+    2. Click "Create Credentials" > "OAuth client ID"
+    3. Choose "Desktop app" as the application type
+    4. Download the credentials JSON file
+
+    ### Step 3: Authenticate
+
+    The first time you use the server, it will:
+    1. Open a browser window for Google authentication
+    2. Request permission to access your Gmail
+    3. Store the refresh token locally for future use
+
+    ### Credential Storage
+
+    - OAuth credentials: `~/.gmail-mcp/gcp-oauth.keys.json`
+    - Access tokens: `~/.gmail-mcp/credentials.json`
+
+    These files are stored in a Docker volume and persist between sessions.
+
+    For detailed instructions, see the [Gmail MCP Server documentation](https://github.com/GongRzhe/Gmail-MCP-Server).
+
+  # Google OAuth credentials file content (JSON)
+  secrets:
+    - name: gmail-oauth.gcp_oauth_keys
+      env: GCP_OAUTH_KEYS
+      example: '{"installed":{"client_id":"...","client_secret":"..."}}'
+
+  # Volume mount for credential persistence
+  # The container needs access to store OAuth tokens

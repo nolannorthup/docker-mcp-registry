@@ -1,0 +1,148 @@
+[
+  {
+    "name": "send_email",
+    "description": "Send an email with optional HTML formatting, CC/BCC, and attachments (up to 25MB total)",
+    "arguments": [
+      {"name": "to", "type": "string", "desc": "Recipient email address", "required": true},
+      {"name": "subject", "type": "string", "desc": "Email subject line", "required": true},
+      {"name": "body", "type": "string", "desc": "Email body content (plain text or HTML)", "required": true},
+      {"name": "cc", "type": "string", "desc": "CC recipients (comma-separated)", "required": false},
+      {"name": "bcc", "type": "string", "desc": "BCC recipients (comma-separated)", "required": false},
+      {"name": "attachments", "type": "array", "desc": "File paths to attach", "required": false}
+    ]
+  },
+  {
+    "name": "draft_email",
+    "description": "Create an email draft for later editing or sending",
+    "arguments": [
+      {"name": "to", "type": "string", "desc": "Recipient email address", "required": true},
+      {"name": "subject", "type": "string", "desc": "Email subject line", "required": true},
+      {"name": "body", "type": "string", "desc": "Email body content", "required": true}
+    ]
+  },
+  {
+    "name": "read_email",
+    "description": "Retrieve full email content including headers and attachments by message ID",
+    "arguments": [
+      {"name": "message_id", "type": "string", "desc": "Gmail message ID", "required": true}
+    ]
+  },
+  {
+    "name": "search_emails",
+    "description": "Search emails using Gmail search syntax (e.g., 'from:user@example.com', 'is:unread', 'subject:hello')",
+    "arguments": [
+      {"name": "query", "type": "string", "desc": "Gmail search query", "required": true},
+      {"name": "max_results", "type": "integer", "desc": "Maximum number of results (default: 10)", "required": false}
+    ]
+  },
+  {
+    "name": "modify_email",
+    "description": "Add or remove labels from an email message",
+    "arguments": [
+      {"name": "message_id", "type": "string", "desc": "Gmail message ID", "required": true},
+      {"name": "add_labels", "type": "array", "desc": "Labels to add", "required": false},
+      {"name": "remove_labels", "type": "array", "desc": "Labels to remove", "required": false}
+    ]
+  },
+  {
+    "name": "delete_email",
+    "description": "Permanently delete an email (cannot be undone)",
+    "arguments": [
+      {"name": "message_id", "type": "string", "desc": "Gmail message ID", "required": true}
+    ]
+  },
+  {
+    "name": "list_email_labels",
+    "description": "List all Gmail labels (system and custom)",
+    "arguments": []
+  },
+  {
+    "name": "create_label",
+    "description": "Create a new custom Gmail label",
+    "arguments": [
+      {"name": "name", "type": "string", "desc": "Label name", "required": true}
+    ]
+  },
+  {
+    "name": "update_label",
+    "description": "Update an existing label's properties",
+    "arguments": [
+      {"name": "label_id", "type": "string", "desc": "Label ID to update", "required": true},
+      {"name": "name", "type": "string", "desc": "New label name", "required": false}
+    ]
+  },
+  {
+    "name": "delete_label",
+    "description": "Delete a custom label",
+    "arguments": [
+      {"name": "label_id", "type": "string", "desc": "Label ID to delete", "required": true}
+    ]
+  },
+  {
+    "name": "get_or_create_label",
+    "description": "Get an existing label or create it if it doesn't exist",
+    "arguments": [
+      {"name": "name", "type": "string", "desc": "Label name", "required": true}
+    ]
+  },
+  {
+    "name": "batch_modify_emails",
+    "description": "Modify labels for multiple emails at once (up to 50 per batch, auto-chunks larger requests)",
+    "arguments": [
+      {"name": "message_ids", "type": "array", "desc": "Array of Gmail message IDs", "required": true},
+      {"name": "add_labels", "type": "array", "desc": "Labels to add to all messages", "required": false},
+      {"name": "remove_labels", "type": "array", "desc": "Labels to remove from all messages", "required": false}
+    ]
+  },
+  {
+    "name": "batch_delete_emails",
+    "description": "Permanently delete multiple emails at once with detailed reporting",
+    "arguments": [
+      {"name": "message_ids", "type": "array", "desc": "Array of Gmail message IDs to delete", "required": true}
+    ]
+  },
+  {
+    "name": "create_filter",
+    "description": "Create a Gmail filter with custom criteria and automated actions",
+    "arguments": [
+      {"name": "criteria", "type": "object", "desc": "Filter criteria (from, to, subject, query, etc.)", "required": true},
+      {"name": "action", "type": "object", "desc": "Actions to perform (addLabelIds, removeLabelIds, forward, etc.)", "required": true}
+    ]
+  },
+  {
+    "name": "list_filters",
+    "description": "List all configured Gmail filters",
+    "arguments": []
+  },
+  {
+    "name": "get_filter",
+    "description": "Get details of a specific filter",
+    "arguments": [
+      {"name": "filter_id", "type": "string", "desc": "Filter ID", "required": true}
+    ]
+  },
+  {
+    "name": "delete_filter",
+    "description": "Delete a Gmail filter",
+    "arguments": [
+      {"name": "filter_id", "type": "string", "desc": "Filter ID to delete", "required": true}
+    ]
+  },
+  {
+    "name": "create_filter_from_template",
+    "description": "Create a filter from predefined templates (newsletters, subject, attachments, large_emails, mailing_lists)",
+    "arguments": [
+      {"name": "template", "type": "string", "desc": "Template name", "required": true},
+      {"name": "params", "type": "object", "desc": "Template-specific parameters", "required": true}
+    ]
+  },
+  {
+    "name": "download_attachment",
+    "description": "Download an email attachment to a specified directory",
+    "arguments": [
+      {"name": "message_id", "type": "string", "desc": "Gmail message ID", "required": true},
+      {"name": "attachment_id", "type": "string", "desc": "Attachment ID", "required": true},
+      {"name": "output_dir", "type": "string", "desc": "Directory to save the attachment", "required": true}
+    ]
+  }
+]

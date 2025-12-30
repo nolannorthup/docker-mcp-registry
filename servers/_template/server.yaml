@@ -1,0 +1,89 @@
+# MCP Server Configuration Template
+# See: https://github.com/docker/mcp-registry/blob/main/CONTRIBUTING.md
+#
+# Replace all {{PLACEHOLDER}} values with your server's details
+
+# Unique identifier for this server (lowercase, hyphens only)
+name: {{server-name}}
+
+# Server type: 'server' for local containers, 'remote' for hosted services
+type: server
+
+# Docker image name (will be published to mcp/ namespace for official registry)
+image: mcp/{{server-name}}
+
+# Metadata for discovery and categorization
+meta:
+  # Primary category (see CONTRIBUTING.md for full list)
+  # Options: communication, database, productivity, development, cloud, ai, data, documentation, security, media
+  category: {{category}}
+
+  # Searchable tags
+  tags:
+    - {{tag1}}
+    - {{tag2}}
+
+# Display information shown in the MCP catalog
+about:
+  title: {{Server Title}}
+  description: >
+    A brief description of what this MCP server does.
+    Include key capabilities and use cases.
+    Keep to 2-3 sentences.
+
+  # Icon URL (256x256 PNG preferred, can use GitHub avatar)
+  icon: https://avatars.githubusercontent.com/u/{{github-user-id}}
+
+# Source repository information
+source:
+  # Link to the original MCP server repository
+  project: https://github.com/{{owner}}/{{repo}}
+
+  # Specific commit hash for reproducibility
+  # Get with: git rev-parse HEAD
+  commit: {{commit-hash}}
+
+# Configuration for secrets, environment variables, and parameters
+config:
+  # Setup instructions shown to users
+  description: |
+    ## Setup Instructions
+
+    1. First step to configure this server
+    2. Second step
+    3. Third step
+
+    For detailed instructions, see the [documentation](https://github.com/{{owner}}/{{repo}}).
+
+  # Secrets stored securely by Docker Desktop
+  # These are encrypted and never exposed in plaintext
+  secrets:
+    - name: {{server-name}}.api_key
+      env: API_KEY
+      example: your-api-key-here
+
+  # Environment variables (non-sensitive configuration)
+  # env:
+  #   - name: LOG_LEVEL
+  #     example: info
+  #     value: info
+
+  # JSON Schema for additional parameters
+  # parameters:
+  #   type: object
+  #   properties:
+  #     timeout:
+  #       type: integer
+  #       default: 30
+  #       description: Request timeout in seconds
+  #   required: []
+
+# For remote servers only (delete this section for local servers)
+# remote:
+#   transport_type: streamable-http  # or 'sse'
+#   url: https://mcp.example.com/endpoint
+#
+# oauth:
+#   - provider: service-name
+#     secret: service.access_token
+#     env: ACCESS_TOKEN

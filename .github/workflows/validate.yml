@@ -1,0 +1,161 @@
+name: Validate MCP Servers
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'servers/**'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'servers/**'
+  workflow_dispatch:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    name: Validate Server Configurations
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install validation dependencies
+        run: |
+          npm install -g ajv-cli js-yaml
+
+      - name: Validate server.yaml files
+        run: |
+          echo "Validating server.yaml files..."
+          for dir in servers/*/; do
+            if [ -f "${dir}server.yaml" ] && [ "$(basename $dir)" != "_template" ]; then
+              echo "Checking ${dir}server.yaml"
+              # Basic YAML syntax validation
+              node -e "
+                const yaml = require('js-yaml');
+                const fs = require('fs');
+                try {
+                  const doc = yaml.load(fs.readFileSync('${dir}server.yaml', 'utf8'));
+                  if (!doc.name) throw new Error('Missing required field: name');
+                  if (!doc.type) throw new Error('Missing required field: type');
+                  if (!doc.about || !doc.about.title) throw new Error('Missing required field: about.title');
+                  console.log('  ✓ Valid');
+                } catch (e) {
+                  console.error('  ✗ Invalid:', e.message);
+                  process.exit(1);
+                }
+              "
+            fi
+          done
+
+      - name: Validate tools.json files
+        run: |
+          echo "Validating tools.json files..."
+          for dir in servers/*/; do
+            if [ -f "${dir}tools.json" ] && [ "$(basename $dir)" != "_template" ]; then
+              echo "Checking ${dir}tools.json"
+              # Validate JSON syntax
+              if ! node -e "JSON.parse(require('fs').readFileSync('${dir}tools.json', 'utf8'))"; then
+                echo "  ✗ Invalid JSON"
+                exit 1
+              fi
+              echo "  ✓ Valid JSON"
+            fi
+          done
+
+      - name: Validate Dockerfiles
+        run: |
+          echo "Validating Dockerfiles..."
+          for dir in servers/*/; do
+            if [ -f "${dir}Dockerfile" ] && [ "$(basename $dir)" != "_template" ]; then
+              echo "Checking ${dir}Dockerfile"
+              # Basic Dockerfile lint using hadolint
+              docker run --rm -i hadolint/hadolint < "${dir}Dockerfile" || true
+              echo "  ✓ Checked"
+            fi
+          done
+
+  build:
+    runs-on: ubuntu-latest
+    name: Build Docker Images
+    needs: validate
+
+    strategy:
+      matrix:
+        server: [gmail-oauth]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build ${{ matrix.server }} image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./servers/${{ matrix.server }}
+          file: ./servers/${{ matrix.server }}/Dockerfile
+          push: false
+          tags: mcp/${{ matrix.server }}:test
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  lint:
+    runs-on: ubuntu-latest
+    name: Lint Documentation
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Lint Markdown files
+        uses: DavidAnson/markdownlint-cli2-action@v14
+        with:
+          globs: |
+            **/*.md
+            !node_modules/**
+
+  security:
+    runs-on: ubuntu-latest
+    name: Security Scan
+    needs: build
+
+    strategy:
+      matrix:
+        server: [gmail-oauth]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build image for scanning
+        uses: docker/build-push-action@v5
+        with:
+          context: ./servers/${{ matrix.server }}
+          file: ./servers/${{ matrix.server }}/Dockerfile
+          push: false
+          load: true
+          tags: mcp/${{ matrix.server }}:scan
+
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: 'mcp/${{ matrix.server }}:scan'
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+          severity: 'CRITICAL,HIGH'
+
+      - name: Upload Trivy scan results
+        uses: github/codeql-action/upload-sarif@v2
+        if: always()
+        with:
+          sarif_file: 'trivy-results.sarif'
